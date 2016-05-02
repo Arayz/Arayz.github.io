@@ -1,0 +1,12 @@
+---
+layout: archive
+permalink: /933KY/
+author_profile: false
+---
+
+{% for post in site.posts %}
+  {% capture category %}{{ post.category }}{% endcapture %}
+  {% if category == '933KY' %}
+    {% include archive-single.html %}
+  {% endif %}
+{% endfor %}

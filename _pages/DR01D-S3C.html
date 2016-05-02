@@ -1,0 +1,12 @@
+---
+layout: archive
+permalink: /dr01d-s3c/
+author_profile: false
+---
+
+{% for post in site.posts %}
+  {% capture category %}{{ post.category }}{% endcapture %}
+  {% if category == 'DR01D-S3C' %}
+    {% include archive-single.html %}
+  {% endif %}
+{% endfor %}

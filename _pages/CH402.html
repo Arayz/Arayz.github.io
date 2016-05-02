@@ -1,0 +1,12 @@
+---
+layout: archive
+permalink: /ch402/
+author_profile: false
+---
+
+{% for post in site.posts %}
+  {% capture category %}{{ post.category }}{% endcapture %}
+  {% if category == 'CH402' %}
+    {% include archive-single.html %}
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,12 @@
+---
+layout: archive
+permalink: /0RD3R3D-5Y573M/
+author_profile: false
+---
+
+{% for post in site.posts %}
+  {% capture category %}{{ post.category }}{% endcapture %}
+  {% if category == '0RD3R3D-5Y573M' %}
+    {% include archive-single.html %}
+  {% endif %}
+{% endfor %}

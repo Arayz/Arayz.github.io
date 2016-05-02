@@ -1,0 +1,12 @@
+---
+layout: archive
+permalink: /AN1M4L/
+author_profile: false
+---
+
+{% for post in site.posts %}
+  {% capture category %}{{ post.category }}{% endcapture %}
+  {% if category == 'AN1M4L' %}
+    {% include archive-single.html %}
+  {% endif %}
+{% endfor %}
