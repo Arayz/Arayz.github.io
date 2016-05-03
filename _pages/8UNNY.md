@@ -7,7 +7,7 @@ permalink: /8unny/
 
 ### 2H1hU: [王奡](https://www.zhihu.com/people/wang-ao-80-76)
 
-### M4iL: arayzw@gmail.com
+### M4iL: arayz_w@icloud.com
 
 ### WeCh47: ArayzBuffer
 

@@ -18,9 +18,9 @@ teaser                   : # filename of teaser fallback teaser image placed in 
 # breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
 comments:
-  provider               : # false (default), "disqus", "facebook", "google-plus", custom"
+  provider               : "disqus" # false (default), "disqus", "facebook", "google-plus", custom"
   disqus:
-    shortname            : # https://help.disqus.com/customer/portal/articles/466208-what-s-a-shortname-
+    shortname            : "@r4y2" # https://help.disqus.com/customer/portal/articles/466208-what-s-a-shortname-
   facebook:
     # https://developers.facebook.com/docs/plugins/comments
     appid                :
@@ -35,7 +35,7 @@ yandex_site_verification :
 
 # Social Sharing
 twitter:
-  username               :
+  username               : "@r4y2_wa"
 facebook:
   username               :
   app_id                 :
@@ -65,7 +65,7 @@ author:
   avatar           : "avatar.jpg"
   bio              : "About program,algorithm,security and other funny stuff."
   location         : "Chengdu City, Sichuan Province"
-  email            : "arayzw@gmail.com"
+  email            : "arayz_w@icloud.com"
   uri              :
   bitbucket        :
   codepen          :
@@ -84,7 +84,7 @@ author:
   stackoverflow    : # http://stackoverflow.com/users/123456/username
   steam            :
   tumblr           :
-  twitter          :
+  twitter          : "@r4y2_wa"
   vine             :
   weibo            :
   xing             :
