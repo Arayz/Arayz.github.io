@@ -32,8 +32,6 @@ and deliver remaining work to the original compiler when instumenting work is
 done, so I could just replace the original compiler and point the cross compile 
 toolchain to get binary instrumented and cross compiled.The flow diagram is as follows:
 
-![flow-diagram](/images/flow-diagram.jpg)
-
 To replace compiler, just add LOCAL_CXX and LOCAL_CC to your afl-gcc in Android.mk,
 set AFL_CXX, AFL_CC and AFL_AS to your AOSP cross compile toolchain. After that, 
 execute "lunch" to choose arch-x86 product and "mm" your source code.
@@ -46,7 +44,5 @@ if you want to porting AFL to arch-arm, that's potential work to do in the futur
 I made afl-fuzz running on Android-5.1.1-x86 successfully, and I add param '-t 100' to 
 give emulator some more time to wait for signals because the binary running on emulator 
 is much slower than host PC.  
-
-![afl-fuzz](/images/afl-fuzz.jpg)
 
 Sorry code is not published yet.
