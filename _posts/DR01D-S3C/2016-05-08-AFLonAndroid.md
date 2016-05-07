@@ -1,5 +1,5 @@
 ---
-title: AFL-on-Android
+title: AFL on Android
 excerpt: "Porting AFL to Android"
 modified: 2016-05-08
 tags: [AFL,fuzz,porting]
