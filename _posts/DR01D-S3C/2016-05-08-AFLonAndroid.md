@@ -3,7 +3,7 @@ title: AFL on Android
 excerpt: "Porting AFL to Android"
 modified: 2016-05-08
 tags: [AFL,fuzz,porting]
-category: DR01D-S3C
+category: CH402
 ---
 
 AFL(American Fuzzy Lop) is a powerful fuzzer for binary on Linux, it employs 
