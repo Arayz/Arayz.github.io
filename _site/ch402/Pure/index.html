@@ -19,7 +19,7 @@
 
 
 
-<title>Pure - 阿瑞@うさぎの穴🐰</title>
+<title>AFL on Android - 阿瑞@うさぎの穴🐰</title>
 
 
 
@@ -29,7 +29,7 @@
 
 <meta property="og:locale" content="en-US">
 <meta property="og:site_name" content="阿瑞@うさぎの穴🐰">
-<meta property="og:title" content="Pure">
+<meta property="og:title" content="AFL on Android">
 
 
   <link rel="canonical" href="https://arayz.github.io/ch402/Pure/">
@@ -37,13 +37,13 @@
 
 
 
-  <meta property="og:description" content="The first blog">
+  <meta property="og:description" content="Porting AFL to Android">
 
 
 
   <meta name="twitter:site" content="@r4y2_wa">
-  <meta name="twitter:title" content="Pure">
-  <meta name="twitter:description" content="The first blog">
+  <meta name="twitter:title" content="AFL on Android">
+  <meta name="twitter:description" content="Porting AFL to Android">
   <meta name="twitter:url" content="https://arayz.github.io/ch402/Pure/">
 
   
@@ -226,35 +226,71 @@
 
 
   <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
-    <meta itemprop="headline" content="Pure">
-    <meta itemprop="description" content="The first blog">
+    <meta itemprop="headline" content="AFL on Android">
+    <meta itemprop="description" content="Porting AFL to Android">
     <meta itemprop="datePublished" content="May 02, 2016">
-    <meta itemprop="dateModified" content="May 02, 2016">
+    <meta itemprop="dateModified" content="May 08, 2016">
 
     <div class="page__inner-wrap">
       
         <header>
-          <h1 class="page__title" itemprop="headline">Pure
+          <h1 class="page__title" itemprop="headline">AFL on Android
 </h1>
           
             <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
 
 
-  less than 1 minute read
+  2 minutes read
 </p>
           
         </header>
       
 
       <section class="page__content" itemprop="text">
-        <p>I took one whole holiday to set up this blog system on github pages. It’s been near a year since I ungraduated from college and never take a real holiday.</p>
+        <p>AFL(American Fuzzy Lop) is a powerful fuzzer for binary on Linux, it employs 
+genetic algorithms to discover interesting signals in runtime, but it doesn’
+support for running on Android officially, so I just work to porting AFL to
+Android and get afl-fuzz running on emulator with arch-x86.</p>
 
-<p>I just work on mobile security research and get intervolution with my fear and anger.
-Maybe the difference between they and me is I’m lack of some pure. Abandoning emotion is
-too hard for me and they just exceed me with this.</p>
+<p>In order to porting completly, I have to cross compile afl-fuzz with bionic 
+and use afl-gcc to instrument the binary I want to fuzz to get fork server 
+and coverage measurements on.</p>
 
-<p>Can it ferment if I keep immersioning in emotion?</p>
+<p>Compiling afl-fuzz is much easier than instrumening the binary, just put whole 
+source folder to “(AOSP)/development/” and execute “mm” on the path with an 
+Android.mk in it, but if you do so, you will just get some errors. The key 
+problem is expecting shm on bionic, Android use ashmem to replace shm, so you 
+need to use ashmem_create_region to create fd instead shmget, and just mmap 
+the address instead shmat, when work is done, just munmap it instead shmctl.
+Another one thing you need to do is to comment the termminal size check in the 
+afl-fuzz.c, or the UI won’t appear as normal.</p>
 
+<p>The bigger challenge of porting AFL is instrumenting target binary. AFL’s 
+documents tell me to set CC and CXX env to replace compiler but AOSP use cross 
+compile toolchains and the makefile is so complicated. By reading afl-gcc.c, 
+I found it just set some params to replace assembler to instrument instructions, 
+and deliver remaining work to the original compiler when instumenting work is 
+done, so I could just replace the original compiler and point the cross compile 
+toolchain to get binary instrumented and cross compiled.The flow diagram is as follows:</p>
+
+<p><img src="/images/flow-diagram.jpg" alt="flow-diagram" /></p>
+
+<p>To replace compiler, just add LOCAL_CXX and LOCAL_CC to your afl-gcc in Android.mk,
+set AFL_CXX, AFL_CC and AFL_AS to your AOSP cross compile toolchain. After that, 
+execute “lunch” to choose arch-x86 product and “mm” your source code.</p>
+
+<p>One last problem is the shell code to be instrument produced by official AFL is x86 
+based only, and it containing shm calling instructions, so you need to write ashmem 
+calling shell codes to replace them, and you need to rewrite whole shell codes of AFL 
+if you want to porting AFL to arch-arm, that’s potential work to do in the future.</p>
+
+<p>I made afl-fuzz running on Android-5.1.1-x86 successfully, and I add param ‘-t 100’ to 
+give emulator some more time to wait for signals because the binary running on emulator 
+is much slower than host PC.</p>
+
+<p><img src="/images/afl-fuzz.jpg" alt="afl-fuzz" /></p>
+
+<p>Sorry code is not published yet.</p>
 
         
       </section>
@@ -279,7 +315,15 @@ too hard for me and they just exceed me with this.</p>
     
       
       
-      <a href="https://arayz.github.io/tags/#pure" class="page__taxonomy-item" rel="tag">Pure</a>
+      <a href="https://arayz.github.io/tags/#afl" class="page__taxonomy-item" rel="tag">AFL</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://arayz.github.io/tags/#fuzz" class="page__taxonomy-item" rel="tag">fuzz</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://arayz.github.io/tags/#porting" class="page__taxonomy-item" rel="tag">porting</a>
     
     </span>
   </p>
@@ -311,7 +355,7 @@ too hard for me and they just exceed me with this.</p>
 
 
         
-          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2016-05-02">May 02, 2016</time></p>
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2016-05-08">May 08, 2016</time></p>
         
       </footer>
 
