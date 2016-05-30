@@ -1,6 +1,6 @@
 ---
 title: An universal way to fuzz a running process by using AFL
-excerpt: "Fuzz a running process AFL to Android"
+excerpt: "Fuzz a running process by using AFL"
 modified: 2016-05-30
 tags: [AFL,Fuzz]
 category: DR01D-S3C
