@@ -1,4 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.0.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2016-05-08T22:17:42+08:00</updated><id>/</id><title>阿瑞@うさぎの穴🐰</title><subtitle></subtitle><author><name>@r4y2</name><email>arayz_w@icloud.com</email></author><entry><title>AFL on Android</title><link href="/dr01d-s3c/AFL-on-Android/" rel="alternate" type="text/html" title="AFL on Android" /><published>2016-05-08T00:00:00+08:00</published><updated>2016-05-08T00:00:00+08:00</updated><id>/dr01d-s3c/AFL-on-Android</id><content type="html" xml:base="/dr01d-s3c/AFL-on-Android/">&lt;p&gt;AFL(American Fuzzy Lop) is a powerful fuzzer for binary on Linux, it employs 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.0.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2016-05-30T18:19:25+08:00</updated><id>/</id><title>阿瑞@うさぎの穴🐰</title><subtitle></subtitle><author><name>@r4y2</name><email>arayz_w@icloud.com</email></author><entry><title>An universal way to fuzz a running process by using AFL</title><link href="/dr01d-s3c/An-universal-way-to-fuzz-a-running-process-by-using-AFL/" rel="alternate" type="text/html" title="An universal way to fuzz a running process by using AFL" /><published>2016-05-30T00:00:00+08:00</published><updated>2016-05-30T00:00:00+08:00</updated><id>/dr01d-s3c/An-universal-way-to-fuzz-a-running-process-by-using-AFL</id><content type="html" xml:base="/dr01d-s3c/An-universal-way-to-fuzz-a-running-process-by-using-AFL/">&lt;p&gt;In &lt;a href=&quot;http://arayz.github.io/dr01d-s3c/AFL-on-Android/&quot;&gt;AFL on Android&lt;/a&gt;, I introduced how 
+am I porting AFL from Linux to Android. It’s certainly that AFL could run on Android as 
+it running on Linux, but I ran into a stone wall when I try to fuzz system_server on 
+Android, the difficulty is AFL dosen’t support for fuzzing an running process officially. 
+Android system service dosen’t provide any dirrect interface to transact data to its 
+bussiness logic. AFL observe and send test cases by forking a subprocess to execute the 
+tartget binary file, and system_server boots up in a very earlly time before all zygote 
+processes.&lt;/p&gt;
+
+&lt;p&gt;An easily-come-up way to solve this problem is editting init.rc to let afl-fuzz boots up 
+app_process so that system_server becomes afl-fuzz’s subprocess. However, it’s difficult to 
+put into effect because this is a big change to whole Android system.&lt;/p&gt;
+
+&lt;p&gt;One another way is modifying source code of afl-fuzz to transact payload to system services 
+instead pipe, this is a feasible scheme but I finally choose a universal way because it’s 
+better not to modify code of an native program as possible.&lt;/p&gt;
+
+&lt;p&gt;I design this as a bridge from afl-fuzz to target process. afl-fuzz execute bridge as 
+subprocess and send test cases to it, bridge transact these test cases to target process 
+and observe crashes by checking pid of it, bridge send back a signal by raise(SIGKILL) to 
+afl-fuzz when target process gets crash. Both bridge and target process need to be instrumented 
+by afl-gcc to get fork-server and coverage mesurements on.&lt;/p&gt;
+
+&lt;p&gt;A difficult point is that afl-fuzz delivers fd of shared_mem to target process by setenv() 
+in native architecture and it takes no effect to whole shell so that target process could 
+not receive env of afl-fuzz in the bridge architecture, so a shared file is needed to deliver 
+fd of shared_mem.&lt;/p&gt;
+
+&lt;p&gt;The architecture is as follows:
+&lt;img src=&quot;/images/afl_arch.jpg&quot; alt=&quot;arch&quot; /&gt;&lt;/p&gt;</content><category term="DR01D-S3C" /><category term="AFL" /><category term="Fuzz" /><summary>Fuzz a running process AFL to Android</summary></entry><entry><title>AFL on Android</title><link href="/dr01d-s3c/AFL-on-Android/" rel="alternate" type="text/html" title="AFL on Android" /><published>2016-05-08T00:00:00+08:00</published><updated>2016-05-08T00:00:00+08:00</updated><id>/dr01d-s3c/AFL-on-Android</id><content type="html" xml:base="/dr01d-s3c/AFL-on-Android/">&lt;p&gt;AFL(American Fuzzy Lop) is a powerful fuzzer for binary on Linux, it employs 
 genetic algorithms to discover interesting signals in runtime, but it doesn’
 support for running on Android officially, so I just work to porting AFL to
 Android and get afl-fuzz running on emulator with arch-x86.&lt;/p&gt;
