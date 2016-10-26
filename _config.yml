@@ -7,7 +7,7 @@
 
 # Site Settings
 locale                   : "en-US"
-title                    : "阿瑞@うさぎの穴🐰"
+title                    : "連接"
 title_separator          : "-"
 name                     : ""
 description              : ""
@@ -61,7 +61,7 @@ google_ad_slot           :
 
 # Site Author
 author:
-  name             : "@r4y2"
+  name             : "Arayz"
   avatar           : "avatar.jpg"
   bio              : "About program,algorithm,security and other funny stuff."
   location         : "Chengdu City, Sichuan Province"
