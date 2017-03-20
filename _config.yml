@@ -35,7 +35,7 @@ yandex_site_verification :
 
 # Social Sharing
 twitter:
-  username               : "@r4y2_wa"
+  username               : "ArayzSegment"
 facebook:
   username               :
   app_id                 :
@@ -64,7 +64,7 @@ author:
   name             : "Arayz"
   avatar           : "avatar.jpg"
   bio              : "About program,algorithm,security and other funny stuff."
-  location         : "Chengdu City, Sichuan Province"
+  location         : "Shanghai City"
   email            : "arayz_w@icloud.com"
   uri              :
   bitbucket        :
@@ -84,7 +84,7 @@ author:
   stackoverflow    : # http://stackoverflow.com/users/123456/username
   steam            :
   tumblr           :
-  twitter          : "@r4y2_wa"
+  twitter          : "ArayzSegment"
   vine             :
   weibo            :
   xing             :
