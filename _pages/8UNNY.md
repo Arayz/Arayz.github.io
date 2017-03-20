@@ -1,7 +1,7 @@
 ---
 layout: archive 
 permalink: /8unny/
-tittle: About Me
+title: About Me
 
 ---
 
