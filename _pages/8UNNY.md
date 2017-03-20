@@ -1,9 +1,9 @@
 ---
 layout: archive 
 permalink: /8unny/
+tittle: About Me
 
 ---
-# About Me
 
 ### M08IL3 53cuRI7Y R353ArCh3r @ [Pangoo](http://www.pwnzen.com)
 
