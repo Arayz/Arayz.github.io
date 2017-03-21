@@ -5,7 +5,7 @@ title: About Me
 
 ---
 
-### M08IL3 53cuRI7Y R353ArCh3r @ [Pangoo](http://www.pwnzen.com)
+### M08IL3 53cuRI7Y R353ArCh3r @ [Pangu](http://www.pwnzen.com)
 
 ### 2H1hU: [王奡](https://www.zhihu.com/people/wang-ao-80-76)
 

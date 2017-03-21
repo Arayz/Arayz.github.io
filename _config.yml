@@ -45,7 +45,7 @@ og_image                 : # Open Graph/Twitter default site image
 # - https://developers.google.com/structured-data/customize/social-profiles
 social:
   type                   : Organization # Person or Organization (defaults to Person)
-  name                   : Pangoo # If the user or organization name differs from the site's name
+  name                   : Pangu # If the user or organization name differs from the site's name
   links                  : pwnzen.com # An array of links to social media profiles
 
 # Analytics
