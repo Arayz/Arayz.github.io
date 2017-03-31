@@ -8,7 +8,7 @@ category: 933KY
 
 Saelo studied a [case](http://www.phrack.org/papers/attacking_javascript_engines.html) of attacking JavaScript engines on Phrack. This paper introduced CVE-2016-4622 in detail, which is a very classic case of UAF on JavaScript engines. I found that it is a very general case of attacking web browsers after studying several same case, so I decided to take notes on them.
 
-###CVE-2017-2362
+**CVE-2017-2362**
 
 It's easy to find the git commit of this vulnerability by using a little trick. Let's see the patch:
 
@@ -89,7 +89,7 @@ It's amazing that it's still possible to break TOCTOU when simply access a conta
 
 Another crux is javascript engines allows to overide prototype's callback, this is a general attack model on browsers, we will disscus this at the end of this article. Now let's see two KeenLab's Safari vulnerabilities of Pwn2Own last year.
 
-###CVE-2016-1859
+**CVE-2016-1859**
 
 I used another trick to get the commit, now let's take a look:
 
@@ -168,7 +168,7 @@ This is because ```setIntegralAttribute(marginwidthAttr, marginWidth);``` will t
 
 This vulnerability isn't as complex as CVE-2017-2362, the hole to break TOCTOU is ```setIntegralAttribute(marginwidthAttr, marginWidth);```
 
-###CVE-2016-1857
+**CVE-2016-1857**
 
 ```diff
 @@ -495,9 +495,8 @@ static inline JSValue join(ExecState& state, JSObject* thisObject, StringView se
@@ -314,6 +314,7 @@ freed by thread T0 here:
 
 This vulnerability looks as same as CVE-2017-2362, but it is diffrent, ```auto data = storage.vector().data();``` cached the address of the vector container artificially which is a very dangerous operation.
 
-##Summerise
+Summerise
+---
 
 Many other UAFs are made of accesing resources by muti threads or processes. But in browsers, JavaScript engines allows overiding prototype's callback which make native code execution path in flexible, so that one thread can also cause unexpected UAF if TOCTOU was violated. Focus on functions that will trigger any handler event, and type conversions that have implicit callbacks, be aware of the location of variable, focus it when the global of member variable is cached, try to find if there is a TOCTOU hole between two access operation of the cache.
