@@ -1,4 +1,97 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.0.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2017-03-31T17:54:19+08:00</updated><id>/</id><title>連接</title><subtitle></subtitle><author><name>Arayz</name><email>arayz_w@icloud.com</email></author><entry><title>A general attack model of UAF on browser</title><link href="/933ky/A-general-attack-model-of-UAF-on-browser/" rel="alternate" type="text/html" title="A general attack model of UAF on browser" /><published>2017-03-31T00:00:00+08:00</published><updated>2017-03-31T00:00:00+08:00</updated><id>/933ky/A-general-attack-model-of-UAF-on-browser</id><content type="html" xml:base="/933ky/A-general-attack-model-of-UAF-on-browser/">&lt;p&gt;Saelo studied a &lt;a href=&quot;http://www.phrack.org/papers/attacking_javascript_engines.html&quot;&gt;case&lt;/a&gt; of attacking JavaScript engines on Phrack. This paper introduced CVE-2016-4622 in detail, which is a very classic case of UAF on JavaScript engines. I found that it is a very general case of attacking web browsers after studying several same case, so I decided to take notes on them.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.0.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2017-03-31T19:33:42+08:00</updated><id>/</id><title>連接</title><subtitle></subtitle><author><name>Arayz</name><email>arayz_w@icloud.com</email></author><entry><title>Notes of a simple UAF in TextTrack destructor</title><link href="/933ky/Notes-of-a-simple-UAF-in-TextTrack-destructor/" rel="alternate" type="text/html" title="Notes of a simple UAF in TextTrack destructor" /><published>2017-03-31T00:00:00+08:00</published><updated>2017-03-31T00:00:00+08:00</updated><id>/933ky/Notes-of-a-simple-UAF-in-TextTrack-destructor</id><content type="html" xml:base="/933ky/Notes-of-a-simple-UAF-in-TextTrack-destructor/">&lt;p&gt;CVE-2016-1856 is used by Lokihardt on Pwn2Own 2016, let’s see the patch:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gu&quot;&gt;@@ -136,11 +136,11 @@ TextTrack::~TextTrack()
+&lt;/span&gt;             m_client-&amp;gt;textTrackRemoveCues(this, m_cues.get());
+ 
+         for (size_t i = 0; i &amp;lt; m_cues-&amp;gt;length(); ++i)
+&lt;span class=&quot;gd&quot;&gt;-            m_cues-&amp;gt;item(i)-&amp;gt;setTrack(0);
+-        if (m_regions) {
+-            for (size_t i = 0; i &amp;lt; m_regions-&amp;gt;length(); ++i)
+-                m_regions-&amp;gt;item(i)-&amp;gt;setTrack(0);
+-        }
+&lt;/span&gt;&lt;span class=&quot;gi&quot;&gt;+            m_cues-&amp;gt;item(i)-&amp;gt;setTrack(nullptr);
++    }
++    if (m_regions) {
++        for (size_t i = 0; i &amp;lt; m_regions-&amp;gt;length(); ++i)
++            m_regions-&amp;gt;item(i)-&amp;gt;setTrack(nullptr);
+&lt;/span&gt;     }
+     clearClient();
+ }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It moves &lt;code class=&quot;highlighter-rouge&quot;&gt;if (m_regions) {&lt;/code&gt; out of the code block, which means there is a situation that &lt;strong&gt;m_regions&lt;/strong&gt; exists while &lt;strong&gt;m_cues&lt;/strong&gt; is null.&lt;/p&gt;
+
+&lt;p&gt;The vulnerability can be trigger as follows:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;trigger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ 	  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;VTTRegion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+	  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;video&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	  &lt;span class=&quot;nx&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;track&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+	  &lt;span class=&quot;nx&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;textTracks&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;addRegion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;vr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	  &lt;span class=&quot;nx&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	  &lt;span class=&quot;nx&quot;&gt;gc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+	  &lt;span class=&quot;nx&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;vr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;track&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;It just creates a &lt;strong&gt;video&lt;/strong&gt; element and append the &lt;strong&gt;TextTrack&lt;/strong&gt; with VTTRegion but no cues. After &lt;code class=&quot;highlighter-rouge&quot;&gt;gc()&lt;/code&gt;, the &lt;code class=&quot;highlighter-rouge&quot;&gt;vr.track&lt;/code&gt; still access the items in the  freed object which didn’t &lt;code class=&quot;highlighter-rouge&quot;&gt;setTrack(0)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Log of ASAN bellows:&lt;/p&gt;
+
+&lt;p&gt;Use:	&lt;code class=&quot;highlighter-rouge&quot;&gt;alert(vr.track)&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ERROR: AddressSanitizer: heap-use-after-free on address 0x61400008dc90 at pc 0x00010e2b6d5a bp 0x7fff5efe8890 sp 0x7fff5efe8888
+READ of size 8 at 0x61400008dc90 thread T0
+    #0 0x10e2b6d59 in JSC::Weak&amp;lt;WebCore::JSDOMObject&amp;gt;::get() const (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x8c9d59)
+    #1 0x10e2b6d14 in WebCore::ScriptWrappable::wrapper() const (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x8c9d14)
+    #2 0x1103adf16 in WebCore::getInlineCachedWrapper(WebCore::DOMWrapperWorld&amp;amp;, WebCore::ScriptWrappable*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x29c0f16)
+    #3 0x1115fb2ca in JSC::JSObject* WebCore::getCachedWrapper&amp;lt;WebCore::TextTrack&amp;gt;(WebCore::DOMWrapperWorld&amp;amp;, WebCore::TextTrack*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x3c0e2ca)
+    #4 0x1115f9c39 in JSC::JSValue WebCore::getExistingWrapper&amp;lt;WebCore::JSTextTrack, WebCore::TextTrack&amp;gt;(WebCore::JSDOMGlobalObject*, WebCore::TextTrack*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x3c0cc39)
+    #5 0x1115f8286 in WebCore::toJS(JSC::ExecState*, WebCore::JSDOMGlobalObject*, WebCore::TextTrack*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x3c0b286)
+    #6 0x1116756f7 in WebCore::jsVTTRegionTrack(JSC::ExecState*, long long, JSC::PropertyName) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x3c886f7)
+    #7 0x1097f345c in JSC::PropertySlot::customGetter(JSC::ExecState*, JSC::PropertyName) const (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x263145c)
+    #8 0x107541b5c in JSC::PropertySlot::getValue(JSC::ExecState*, JSC::PropertyName) const (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x37fb5c)
+    #9 0x107540d50 in JSC::JSValue::get(JSC::ExecState*, JSC::PropertyName, JSC::PropertySlot&amp;amp;) const (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x37ed50)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Free:	&lt;code class=&quot;highlighter-rouge&quot;&gt;v = null&lt;/code&gt; –&amp;gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;gc()&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;freed by thread T0 here:
+    #0 0x1056ae799 in wrap_free (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/7.0.0/lib/darwin/libclang_rt.asan_osx_dynamic.dylib+0x43799)
+    #1 0x109e6ca94 in bmalloc::Deallocator::deallocateSlowCase(void*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x2caaa94)
+    #2 0x109d61273 in bmalloc::Deallocator::deallocate(void*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x2b9f273)
+    #3 0x109d61215 in bmalloc::Cache::deallocate(void*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x2b9f215)
+    #4 0x109d5fce4 in bmalloc::api::free(void*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x2b9dce4)
+    #5 0x109d5f374 in WTF::fastFree(void*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/JavaScriptCore.framework/Versions/A/JavaScriptCore+0x2b9d374)
+    #6 0x10dddc124 in WTF::RefCounted&amp;lt;WebCore::TrackBase&amp;gt;::operator delete(void*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x3ef124)
+    #7 0x111942641 in WebCore::LoadableTextTrack::~LoadableTextTrack() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x3f55641)
+    #8 0x10dddf735 in WTF::RefCounted&amp;lt;WebCore::TrackBase&amp;gt;::deref() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x3f2735)
+    #9 0x10fbf4c19 in void WTF::derefIfNotNull&amp;lt;WebCore::LoadableTextTrack&amp;gt;(WebCore::LoadableTextTrack*) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x2207c19)
+    #10 0x10fbf4b6a in WTF::RefPtr&amp;lt;WebCore::LoadableTextTrack&amp;gt;::~RefPtr() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x2207b6a)
+    #11 0x10fbefcf4 in WTF::RefPtr&amp;lt;WebCore::LoadableTextTrack&amp;gt;::~RefPtr() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x2202cf4)
+    #12 0x10fbed228 in WebCore::HTMLTrackElement::~HTMLTrackElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x2200228)
+    #13 0x10fbed264 in WebCore::HTMLTrackElement::~HTMLTrackElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x2200264)
+    #14 0x10fbed2b8 in WebCore::HTMLTrackElement::~HTMLTrackElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x22002b8)
+    #15 0x10e2cd5ae in WebCore::removeDetachedChildrenInContainer(WebCore::ContainerNode&amp;amp;) (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x8e05ae)
+    #16 0x10e2aa8ad in WebCore::ContainerNode::removeDetachedChildren() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x8bd8ad)
+    #17 0x10e2ab291 in WebCore::ContainerNode::~ContainerNode() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x8be291)
+    #18 0x10efd5717 in WebCore::Element::~Element() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x15e8717)
+    #19 0x1135aa912 in WebCore::StyledElement::~StyledElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x5bbd912)
+    #20 0x10de0ac64 in WebCore::HTMLElement::~HTMLElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x41dc64)
+    #21 0x10fa531d4 in WebCore::HTMLMediaElement::~HTMLMediaElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x20661d4)
+    #22 0x10fc1ec77 in WebCore::HTMLVideoElement::~HTMLVideoElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x2231c77)
+    #23 0x10fc1d8c4 in WebCore::HTMLVideoElement::~HTMLVideoElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x22308c4)
+    #24 0x10fc1d8e8 in WebCore::HTMLVideoElement::~HTMLVideoElement() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x22308e8)
+    #25 0x111f110c6 in WebCore::Node::removedLastRef() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x45240c6)
+    #26 0x10da04ece in WebCore::Node::deref() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x17ece)
+    #27 0x111f014f4 in WebCore::Node::derefEventTarget() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x45144f4)
+    #28 0x10e9eff32 in WebCore::EventTarget::deref() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x1002f32)
+    #29 0x10eeef0c9 in WTF::Ref&amp;lt;WebCore::EventTarget&amp;gt;::~Ref() (/Users/arayz/arayz/git/WebKit/WebKitBuild/Debug/WebCore.framework/Versions/A/WebCore+0x15020c9)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;</content><category term="933KY" /><category term="Notes" /><category term="UAF" /><category term="Attack Model" /><category term="Lokihardt" /><summary>Notes of CVE-2016-1856</summary></entry><entry><title>A general attack model of UAF on browser</title><link href="/933ky/A-general-attack-model-of-UAF-on-browser/" rel="alternate" type="text/html" title="A general attack model of UAF on browser" /><published>2017-03-31T00:00:00+08:00</published><updated>2017-03-31T00:00:00+08:00</updated><id>/933ky/A-general-attack-model-of-UAF-on-browser</id><content type="html" xml:base="/933ky/A-general-attack-model-of-UAF-on-browser/">&lt;p&gt;Saelo studied a &lt;a href=&quot;http://www.phrack.org/papers/attacking_javascript_engines.html&quot;&gt;case&lt;/a&gt; of attacking JavaScript engines on Phrack. This paper introduced CVE-2016-4622 in detail, which is a very classic case of UAF on JavaScript engines. I found that it is a very general case of attacking web browsers after studying several same case, so I decided to take notes on them.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;CVE-2017-2362&lt;/strong&gt;&lt;/p&gt;
 
